@@ -1,0 +1,28 @@
+{
+  "name": "db_forum_project",
+  "version": "1.0.0",
+  "description": "Приложение форума с БД PostgreSQL и backend на NodeJs по курсу \"СУБД\"",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node ./src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ivan-Bir/db_forum_project.git"
+  },
+  "author": "Ivan Biryukov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ivan-Bir/db_forum_project/issues"
+  },
+  "homepage": "https://github.com/Ivan-Bir/db_forum_project#readme",
+  "dependencies": {
+    "bluebird": "^3.7.2",
+    "fastify": "^4.11.0",
+    "fastify-postgres": "^3.7.0",
+    "pg": "^8.8.0",
+    "pg-promise": "^11.0.2"
+  }
+}
