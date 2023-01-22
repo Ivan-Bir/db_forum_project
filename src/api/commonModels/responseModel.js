@@ -1,4 +1,4 @@
-import { BaseModel } from "../commonModels/baseModel.js";
+import { BaseModel } from '../commonModels/baseModel.js';
 
 export  class ResponseModel extends BaseModel {
     constructor(props) {

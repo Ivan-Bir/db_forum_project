@@ -1,9 +1,5 @@
-import { ResponseModel } from "../commonModels/responseModel.js";
-import { dbService } from "../../db/dbService.js";
-import { PostModel } from "../post/postModel.js";
-// import { validate } from "../utils/utils.js";
-// import { ForumModel } from "./forumModel.js";
-// import { UserModel } from "../user/userModel.js";
+import { ResponseModel } from '../commonModels/responseModel.js';
+import { dbService } from '../../db/dbService.js';
 
 class PostRepository {
     constructor() {
@@ -17,7 +13,6 @@ class PostRepository {
             if (posts[i].parent) {
                 const dbPostParent = await this.dbCon.db.oneOrNone('SELECT id FROM post WHERE id = $1 AND thread_id = $2', [posts[i].parent, thread.props.id]);
                 if (!dbPostParent) {
-                    console.log('\n13!');
                     response.props.status = 409;
                     return response;
                 }
@@ -42,11 +37,8 @@ class PostRepository {
 
         const time = new Date();
         const values = posts.map((post, idx) => {
-            // const parent = post.parent ? post.parent : 0;
-            console.log('\n', users[idx].nickname, '\n');
             return {
                 user_nickname: users[idx].nickname,
-                // author_id: users[idx].id,
                 forum_slug: thread.props.forum_slug,
                 thread_id: thread.props.id,
                 created: time,
@@ -79,7 +71,6 @@ class PostRepository {
 
             response.props.status = 201;
         } catch (error) {
-            console.log('\n14!');
             response.props.status = 409;
             response.props.body = error.message;
         }
@@ -115,7 +106,7 @@ class PostRepository {
         try {
             return await this.dbCon.db.oneOrNone('SELECT id, user_nickname, created, message, parent_id, forum_slug, is_edited, thread_id FROM post WHERE id = $1', id);
         } catch (error) {
-            console.log(`ERROR: getPostById post, ${JSON.stringify(error)}`);
+            console.error(`ERROR: getPostById post, ${JSON.stringify(error)}`);
         }
     }
 
@@ -169,17 +160,17 @@ class PostRepository {
     async getCount() {
         try {
             const items = await this.dbCon.db.one(`SELECT count(id) FROM post`);
-            return items ? Number(items.count) : 1;
+            return items ? +items.count : 1;
         } catch (error) {
-            console.log(`ERROR: getCount post, ${JSON.stringify(error)}`);
+            console.error(`ERROR: getCount post, ${JSON.stringify(error)}`);
         }
     }
 
-    async clearAll() {
+    async clear() {
         try {
             return await this.dbCon.db.none(`TRUNCATE post CASCADE`);
         } catch (error) {
-            console.log(`ERROR: clearAll post, ${JSON.stringify(error)}`);
+            console.error(`ERROR: clear post, ${JSON.stringify(error)}`);
         }
     }
 }

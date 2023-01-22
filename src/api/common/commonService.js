@@ -1,7 +1,7 @@
-import { postRepository } from "../post/postRepository.js";
-import { userRepository } from "../user/userRepository.js";
-import { threadRepository } from "../thread/threadRepository.js";
-import { forumRepository } from "../forum/forumRepository.js";
+import { postRepository } from '../post/postRepository.js';
+import { userRepository } from '../user/userRepository.js';
+import { threadRepository } from '../thread/threadRepository.js';
+import { forumRepository } from '../forum/forumRepository.js';
 
 class CommonService {
     async status(req, res) {
@@ -14,10 +14,10 @@ class CommonService {
     }
 
     async delete(req, res) {
-        await forumRepository.clearAll();
-        await userRepository.clearAll();
-        await threadRepository.clearAll();
-        await postRepository.clearAll();
+        await forumRepository.clear();
+        await userRepository.clear();
+        await threadRepository.clear();
+        await postRepository.clear();
 
         return res.code(200).send(null);
     }

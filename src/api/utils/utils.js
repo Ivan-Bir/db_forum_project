@@ -12,8 +12,3 @@ export const isId = (value) => {
 
     return false;
 };
-
-export const convertToSlug = (str) => {
-    return str.toLowerCase().replace(/[^\w ]+/g,'').replace(/ +/g,'-');
-};
-

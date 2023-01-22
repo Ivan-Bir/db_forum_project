@@ -1,14 +1,14 @@
-import { ThreadModel } from "../thread/threadModel.js";
-import { threadRepository } from "../thread/threadRepository.js";
-import { postRepository } from "../post/postRepository.js";
-import { isId } from "../utils/utils.js";
+import { ThreadModel } from '../thread/threadModel.js';
+import { threadRepository } from '../thread/threadRepository.js';
+import { postRepository } from '../post/postRepository.js';
+import { isId } from '../utils/utils.js';
 
 class ThreadService {
     async createPost(req, res) {
         const posts  = req.body;
 
         const type = isId(req.params.slug) ? 'id' : 'slug';
-        const value = isId(req.params.slug) ? Number(req.params.slug) : req.params.slug;
+        const value = isId(req.params.slug) ? +req.params.slug : req.params.slug;
 
         let dbThread = await threadRepository.getThread(type, value);
 
@@ -19,35 +19,19 @@ class ThreadService {
         }
 
         const thread = new ThreadModel(dbThread);
-        console.log('THREAD:', JSON.stringify(thread));
 
         if (Array.isArray(posts) && posts.length === 0) {
             return res.code(201).send(posts);
         }
-        //
-        // const users: ModelUser[] = [];
-        //
-        // for (const post of posts) {
-        //     const user: any = await UserRepository.getByNickname(post.author);
-        //
-        //     if (!user) {
-        //         return res.code(404).send({ message: `Can't find user with nickname ${post.author}` });
-        //     }
-        //
-        //
-        //     users.push(new ModelUser(user));
-        // }
 
         const resultPost = await postRepository.createPost(posts, thread);
 
         if (resultPost.props.status === 409) {
-            console.log('\n11!');
             return res.code(409).send({ message: resultPost.props.body });
         } else if (resultPost.props.status === 404) {
             return res.code(404).send({ message: "Can't find post author by nickname" })
         }
 
-        console.log('\n12!');
         return res.code(201).send(resultPost.props.body.map((post) => ({
             id: post.id,
             parent: post.parent_id,
@@ -65,16 +49,14 @@ class ThreadService {
         const vote = req.body;
 
         const typeKey = isId(req.params.slug) ? 'id' : 'slug';
-        const threadIdenf = typeKey === 'id' ? Number(req.params.slug) : req.params.slug;
+        const threadIdenf = typeKey === 'id' ? +req.params.slug : req.params.slug;
 
         const dbVote = await threadRepository.createVote(vote.voice, vote.nickname, typeKey, threadIdenf);
 
         if (dbVote.props.status !== 200) {
-        console.log('\n14!', JSON.stringify(dbVote.props));
             return res.code(404).send({ message: dbVote.props.body })
         }
 
-        console.log('voteToThread:', JSON.stringify(dbVote.props.body));
         return res.code(200).send({
             id: dbVote.props.body.id,
             author: dbVote.props.body.user_nickname,
@@ -89,7 +71,7 @@ class ThreadService {
 
     async getDetails(req, res) {
         const typeKey = isId(req.params.slug) ? 'id' : 'slug';
-        const threadIdenf = typeKey === 'id' ? Number(req.params.slug) : req.params.slug;
+        const threadIdenf = typeKey === 'id' ? +req.params.slug : req.params.slug;
 
         let dbThread = await threadRepository.getThread(typeKey, threadIdenf);
 
@@ -111,7 +93,7 @@ class ThreadService {
 
     async getThreadsPost(req, res) {
         const typeKey = isId(req.params.slug) ? 'id' : 'slug';
-        const threadIdenf = typeKey === 'id' ? Number(req.params.slug) : req.params.slug;
+        const threadIdenf = typeKey === 'id' ? +req.params.slug : req.params.slug;
 
         let dbThread = await threadRepository.getThread(typeKey, threadIdenf);
 
@@ -140,7 +122,7 @@ class ThreadService {
 
     async updateThread(req, res) {
         const typeKey = isId(req.params.slug) ? 'id' : 'slug';
-        const threadIdenf = typeKey === 'id' ? Number(req.params.slug) : req.params.slug;
+        const threadIdenf = typeKey === 'id' ? +req.params.slug : req.params.slug;
 
         let dbThread = await threadRepository.getThread(typeKey, threadIdenf);
 

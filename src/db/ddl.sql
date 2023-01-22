@@ -1,14 +1,13 @@
 CREATE EXTENSION IF NOT EXISTS CITEXT;
 
 CREATE UNLOGGED TABLE IF NOT EXISTS users (
-    id       SERIAL     UNIQUE NOT NULL,
-    nickname CITEXT     NOT NULL PRIMARY KEY,
-    email    CITEXT     NOT NULL UNIQUE,
-    fullname CITEXT     NOT NULL,
-    about    TEXT       NOT NULL
+    id       serial         UNIQUE NOT NULL,
+    nickname citext         NOT NULL PRIMARY KEY,
+    email    citext         NOT NULL UNIQUE,
+    fullname citext         NOT NULL,
+    about    text           NOT NULL
 );
 
--- К одному стилю
 CREATE UNLOGGED TABLE IF NOT EXISTS forum (
     id            serial             NOT NULL,
     title         varchar(255)       NOT NULL,
@@ -20,16 +19,14 @@ CREATE UNLOGGED TABLE IF NOT EXISTS forum (
 
 CREATE UNLOGGED TABLE IF NOT EXISTS forum_users (
     user_nickname    citext             NOT NULL REFERENCES users (nickname) ON DELETE CASCADE,
-    -- user_email       citext             NOT NULL REFERENCES users (email) ON DELETE CASCADE,
     forum_slug       citext             NOT NULL REFERENCES forum (slug) ON DELETE CASCADE,
     PRIMARY KEY      (user_nickname, forum_slug)
-    -- user_fullname    varchar(255)       NOT NULL, --?
-    -- user_about       text               NOT NULL --?
 );
 
 CREATE UNLOGGED TABLE IF NOT EXISTS thread (
     id            serial         NOT NULL PRIMARY KEY,
-    slug          citext         NOT NULL,
+    -- slug          citext         NOT NULL,
+    slug          citext         UNIQUE,
     user_nickname citext         NOT NULL REFERENCES users (nickname) ON DELETE CASCADE,
     forum_slug    citext         NOT NULL REFERENCES forum (slug) ON DELETE CASCADE,
     title         varchar(255)   NOT NULL,

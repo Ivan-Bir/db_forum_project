@@ -1,33 +1,27 @@
-import fastify from "fastify";
+import fastify from 'fastify';
 
-import { API } from "./api/config/routes.js";
-import { userService } from "./api/user/userService.js";
-import { forumService } from "./api/forum/forumService.js";
-import { threadService } from "./api/thread/threadService.js";
-import { postService } from "./api/post/postService.js";
-import { commonService } from "./api/common/commonService.js";
+import { API } from './api/config/routes.js';
+import { userService } from './api/user/userService.js';
+import { forumService } from './api/forum/forumService.js';
+import { threadService } from './api/thread/threadService.js';
+import { postService } from './api/post/postService.js';
+import { commonService } from './api/common/commonService.js';
 
 
-// const app = fastify({
-//     ignoreTrailingSlash: true,
-//     caseSensitive: false,
-// });
-
-const app = fastify({
-    logger: true
-});
+const app = fastify({});
 
 app.addContentTypeParser('application/json', { parseAs: 'string' }, function (req, body, done) {
     try {
         let json = {};
-        if (body){
-            json = JSON.parse(body)
+        if (body) {
+            json = JSON.parse(body);
         }
-        done(null, json)
-    } catch (err) {
-        console.error(err)
-        err.statusCode = 403;
-        done(err, undefined)
+
+        done(null, json);
+    } catch (error) {
+        console.error(error);
+        error.statusCode = 403;
+        done(error, null);
     }
 });
 
@@ -64,5 +58,5 @@ app.get(API.get.service, commonService.status);
 app.post(API.post.service, commonService.delete);
 
 app.listen({ port: 5000, host: '0.0.0.0' }, () => {
-    console.log(`server is listening on localhost: 5000`);
+    console.log(`Start listening at port: 5000`);
 });

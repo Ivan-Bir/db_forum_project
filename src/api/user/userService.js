@@ -1,5 +1,5 @@
-import { UserModel } from "./userModel.js";
-import { userRepository } from "./userRepository.js";
+import { UserModel } from './userModel.js';
+import { userRepository } from './userRepository.js';
 
 class UserService {
     async getUser(req, res) {
@@ -13,14 +13,12 @@ class UserService {
     }
 
     async createUser(req, res) {
-        const user = new UserModel({////req.body
+        const user = new UserModel({
             email: req.body.email,
             nickname: req.params.nickname,
             fullname: req.body.fullname,
             about: req.body.about
         });
-
-        console.log('USER REQ:', JSON.stringify(user));
 
         const dbUser = await userRepository.getUsersByEmailOrNickname(user.props.email, user.props.nickname);
         if (dbUser && dbUser.length) {

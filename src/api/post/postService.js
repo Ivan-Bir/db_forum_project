@@ -1,10 +1,8 @@
-import { PostModel } from "../post/postModel.js";
-import { postRepository } from "../post/postRepository.js";
-import { userRepository } from "../user/userRepository.js";
-import { threadRepository } from "../thread/threadRepository.js";
-import { ForumModel } from "../forum/forumModel.js";
-import { forumRepository } from "../forum/forumRepository.js";
-// import { isId } from "../utils/utils.js";
+import { PostModel } from '../post/postModel.js';
+import { postRepository } from '../post/postRepository.js';
+import { userRepository } from '../user/userRepository.js';
+import { threadRepository } from '../thread/threadRepository.js';
+import { forumRepository } from '../forum/forumRepository.js';
 
 class PostService {
     async getDetails(req, res) {
@@ -99,13 +97,6 @@ class PostService {
         const updatedPost = await postRepository.updatePost(new PostModel({
             ...dbPost,
             message: req.body.message
-            // forum: dbPost.forum_slug,
-            // id: dbPost.id,
-            // thread: dbPost.thread_id,
-            // parent: dbPost.parent_id,
-            // isEdited: dbPost.is_edited,
-            // author: dbPost.user_nickname,
-            // created: dbPost.created
         }));
 
         return res.code(updatedPost.props.status).send(updatedPost.props.body);

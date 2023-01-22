@@ -1,8 +1,6 @@
-import { ResponseModel } from "../commonModels/responseModel.js";
-import { dbService } from "../../db/dbService.js";
-import { validate } from "../utils/utils.js";
-// import { ForumModel } from "./forumModel.js";
-// import { UserModel } from "../user/userModel.js";
+import { ResponseModel } from '../commonModels/responseModel.js';
+import { dbService } from '../../db/dbService.js';
+import { validate } from '../utils/utils.js';
 
 class ThreadRepository {
     constructor() {
@@ -17,7 +15,6 @@ class ThreadRepository {
                 [
                     thread.props.slug,
                     user.props.nickname,
-                    // user.props.id,
                     forum.props.slug,
                     thread.props.created,
                     thread.props.title,
@@ -25,7 +22,7 @@ class ThreadRepository {
                 ]);
             response.props.status = 201;
         } catch (error) {
-            response.props.status = 505;
+            response.props.status = 500;
             response.props.body = { message: error.message };
         }
 
@@ -36,7 +33,7 @@ class ThreadRepository {
         try {
             return await this.dbCon.db.oneOrNone(`SELECT id, slug, user_nickname, forum_slug, created, title, message, votes FROM thread WHERE ${typeKey} = $1`, identificator)
         } catch(error) {
-            console.log(`ERROR: getThread thread, ${JSON.stringify(error)}`);
+            console.error(`ERROR: getThread thread, ${JSON.stringify(error)}`);
         }
     }
 
@@ -65,24 +62,15 @@ class ThreadRepository {
         try {
             return await this.dbCon.db.manyOrNone(dbRequest, [forum_slug, since, limit]);
         } catch (error) {
-            console.log(`ERROR: getBySlug forum, ${JSON.stringify(error)}`);
+            console.error(`ERROR: getForumThread thread, ${JSON.stringify(error)}`);
         }
     }
 
     async createVote(voice, userNickname, typeKey, threadIdentif) {
         const response = new ResponseModel();
-        console.log('voice, userNickname, typeKey, threadIdentif', voice, userNickname, typeKey, threadIdentif);
         const request = typeKey === 'id' ? 'VALUES ($1, $2, $3)' : 'SELECT $1, thread.id, $3 FROM thread WHERE thread.slug = $2';
 
-        console.log(request);
         try {
-            // const data = await this.dbCon.db.tx((t) => {
-            //    return t.batch([
-            //        t.none(`INSERT INTO vote (user_nickname, thread_id, voice) ${request} ON CONFLICT ON CONSTRAINT votes_user_thread_unique DO UPDATE SET voice = $3`, [userNickname, threadIdentif, voice]),
-            //        t.one(`SELECT id, slug, user_nickname, forum_slug, created, title, message, votes FROM thread WHERE ${typeKey} = $1`, threadIdentif),
-            //    ]);
-            // });
-
             const result = await this.dbCon.db.tx((t) => {
                 return t.batch([
                     t.none(`INSERT INTO vote (user_nickname, thread_id, voice) ${request} ON CONFLICT (thread_id, user_nickname) DO UPDATE SET voice = $3`, [userNickname, threadIdentif, voice]),
@@ -115,24 +103,24 @@ class ThreadRepository {
             }
             return await this.dbCon.db.oneOrNone(query);
         } catch (error) {
-            console.log(`ERROR: updateThread thread, ${JSON.stringify(error)}`);
+            console.error(`ERROR: updateThread thread, ${JSON.stringify(error)}`);
         }
     }
 
     async getCount() {
         try {
             const items = await this.dbCon.db.one(`SELECT count(id) FROM thread`);
-            return items ? Number(items.count) : 1;
+            return items ? +items.count : 1;
         } catch (error) {
-            console.log(`ERROR: getCount thread, ${JSON.stringify(error)}`);
+            console.error(`ERROR: getCount thread, ${JSON.stringify(error)}`);
         }
     }
 
-    async clearAll() {
+    async clear() {
         try {
             return await this.dbCon.db.none(`TRUNCATE thread CASCADE`);
         } catch (error) {
-            console.log(`ERROR: clearAll thread, ${JSON.stringify(error)}`);
+            console.error(`ERROR: clear thread, ${JSON.stringify(error)}`);
         }
     }
 }
