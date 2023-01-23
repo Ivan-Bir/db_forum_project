@@ -1,5 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS CITEXT;
 
+-- users
 CREATE UNLOGGED TABLE IF NOT EXISTS users (
     id       serial         UNIQUE NOT NULL,
     nickname citext         NOT NULL PRIMARY KEY,
@@ -8,6 +9,10 @@ CREATE UNLOGGED TABLE IF NOT EXISTS users (
     about    text           NOT NULL
 );
 
+CREATE INDEX users_id_index ON users(id);
+CREATE INDEX users_nickname_index ON users(nickname);
+
+-- forum
 CREATE UNLOGGED TABLE IF NOT EXISTS forum (
     id            serial             NOT NULL,
     title         varchar(255)       NOT NULL,
@@ -17,15 +22,22 @@ CREATE UNLOGGED TABLE IF NOT EXISTS forum (
     threads       int                NOT NULL DEFAULT 0
 );
 
+CREATE INDEX forum_id_index ON forum(id);
+CREATE INDEX forum_user_nickname_index ON forum(user_nickname);
+CREATE INDEX forum_slug_index ON forum(slug);
+
+-- forum_users
 CREATE UNLOGGED TABLE IF NOT EXISTS forum_users (
     user_nickname    citext             NOT NULL REFERENCES users (nickname) ON DELETE CASCADE,
     forum_slug       citext             NOT NULL REFERENCES forum (slug) ON DELETE CASCADE,
     PRIMARY KEY      (user_nickname, forum_slug)
 );
 
+CREATE INDEX forum_users_forum_user_index ON forum_users(forum_slug, user_nickname);
+
+-- thread
 CREATE UNLOGGED TABLE IF NOT EXISTS thread (
     id            serial         NOT NULL PRIMARY KEY,
-    -- slug          citext         NOT NULL,
     slug          citext         UNIQUE,
     user_nickname citext         NOT NULL REFERENCES users (nickname) ON DELETE CASCADE,
     forum_slug    citext         NOT NULL REFERENCES forum (slug) ON DELETE CASCADE,
@@ -35,6 +47,11 @@ CREATE UNLOGGED TABLE IF NOT EXISTS thread (
     votes         int            DEFAULT 0
 );
 
+CREATE INDEX thread_id_index ON thread(id);
+CREATE INDEX thread_slug_index ON thread(slug);
+CREATE INDEX thread_forum_slug_index ON thread(forum_slug);
+
+-- post
 CREATE UNLOGGED TABLE IF NOT EXISTS post (
     id              serial      NOT NULL PRIMARY KEY,
     parent_id       int         NOT NULL DEFAULT 0,
@@ -47,6 +64,11 @@ CREATE UNLOGGED TABLE IF NOT EXISTS post (
     pathTree        int[]       DEFAULT array []::int[]
 );
 
+CREATE INDEX post_thread_id_index ON post (thread_id);
+CREATE INDEX post_pathTree_index ON post (pathTree);
+CREATE INDEX post_pathTree_1_index ON post ((pathTree[1]));
+
+-- vote
 CREATE UNLOGGED TABLE IF NOT EXISTS vote (
     thread_id       int     NOT NULL REFERENCES thread (id) ON DELETE CASCADE,
     user_nickname   citext  NOT NULL REFERENCES users (nickname) ON DELETE CASCADE,
@@ -73,7 +95,7 @@ EXECUTE FUNCTION on_insert_vote();
 CREATE OR REPLACE FUNCTION on_update_vote() RETURNS trigger AS
 $$
 BEGIN
-    UPDATE thread SET votes = thread.votes + new.voice - old.voice where id = new.thread_id;
+    UPDATE thread SET votes = thread.votes + new.voice - old.voice WHERE id = new.thread_id;
     RETURN new;
 END;
 $$ LANGUAGE plpgsql;

@@ -99,7 +99,7 @@ class ThreadRepository {
             if (query === true) {
                 return true;
             } else {
-                query += `WHERE id = ${thread_id} RETURNING *`;
+                query += `WHERE id = ${thread_id} RETURNING id, slug, user_nickname, forum_slug, created, title, message, votes`;
             }
             return await this.dbCon.db.oneOrNone(query);
         } catch (error) {
@@ -109,7 +109,7 @@ class ThreadRepository {
 
     async getCount() {
         try {
-            const items = await this.dbCon.db.one(`SELECT count(id) FROM thread`);
+            const items = await this.dbCon.db.one('SELECT count(id) FROM thread');
             return items ? +items.count : 1;
         } catch (error) {
             console.error(`ERROR: getCount thread, ${JSON.stringify(error)}`);
@@ -118,7 +118,7 @@ class ThreadRepository {
 
     async clear() {
         try {
-            return await this.dbCon.db.none(`TRUNCATE thread CASCADE`);
+            return await this.dbCon.db.none('TRUNCATE thread CASCADE');
         } catch (error) {
             console.error(`ERROR: clear thread, ${JSON.stringify(error)}`);
         }
